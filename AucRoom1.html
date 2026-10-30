@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IPL Auction · Room 1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#eef0f6;--card:#fff;--ink:#12141c;--mut:#667089;--line:#dfe2ec;--acc:#c8102e;--acc2:#2557ff;--ok:#0a8a4a;--warn:#b86e00;--bad:#c4122f;--tick:#12141c;--tickink:#ffd54a;--sh:0 1px 2px rgba(20,25,50,.06),0 6px 18px rgba(20,25,50,.06);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0d14;--card:#151826;--ink:#eef0f8;--mut:#98a0b8;--line:#272c40;--acc:#ff4d6a;--acc2:#6c9cff;--ok:#3ddc84;--warn:#ffb020;--bad:#ff5470;--tick:#000;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}}
+:root[data-theme="dark"]{--bg:#0b0d14;--card:#151826;--ink:#eef0f8;--mut:#98a0b8;--line:#272c40;--acc:#ff4d6a;--acc2:#6c9cff;--ok:#3ddc84;--warn:#ffb020;--bad:#ff5470;--tick:#000;--sh:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}*{box-sizing:border-box}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:60}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:var(--acc2);color:#fff;border:0;border-radius:9px;padding:9px 15px;cursor:pointer;font-weight:650}
+button:hover{filter:brightness(1.08)}button:disabled{opacity:.4;cursor:not-allowed}
+button.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}button.bad{background:var(--bad)}button.ok{background:var(--ok);color:#fff}button.sm{padding:3px 10px;font-size:12px}
+input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc2);outline-offset:-1px}
+label{font-size:12px;color:var(--mut);display:block;margin:10px 0 4px;font-weight:600}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.bar h1{font-size:17px;margin:0;flex:1;min-width:160px}
+.pill{font-size:12px;border-radius:999px;padding:3px 10px;border:1px solid var(--line);color:var(--mut)}.pill.on{color:var(--ok);border-color:var(--ok)}
+#adminV{max-width:1560px;margin:auto;padding:0 20px 40px}
+#bans{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:30;padding-top:10px}
+.sec3{margin-top:26px}.sec3>h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 12px;display:flex;gap:10px;align-items:center}
+.sec3>h2 b{background:var(--acc);color:#fff;border-radius:7px;padding:2px 9px;letter-spacing:0}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--sh);min-width:0}
+.card h3{font-size:14px;margin:0 0 6px}.card .hint{color:var(--mut);font-size:12px;margin:0 0 8px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.row>*{flex:1;min-width:120px}
+.ban{border-radius:11px;padding:11px 14px;margin-bottom:8px;display:flex;gap:10px;font-weight:650;box-shadow:var(--sh)}
+.ban.bad{background:var(--bad);color:#fff}.ban.warn{background:var(--warn);color:#fff}.ban.good{background:var(--ok);color:#fff}
+.ban button{background:rgba(0,0,0,.25);padding:0 9px;margin-left:auto}
+.cur{padding:16px;border-radius:14px;background:var(--bg);margin:10px 0;text-align:center}
+.cur b{font-size:28px;display:block;line-height:1.15}.cur span{color:var(--mut)}
+.price{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.price>div{background:var(--bg);border-radius:12px;padding:10px 12px}
+.price small{color:var(--mut);font-weight:600;font-size:12px}
+.price input{font-size:20px;font-weight:800;margin-top:4px}
+.raise{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.raise button{flex:1;min-width:90px}
+.msg{font-size:13px;min-height:19px;margin-top:6px}.msg.bad{color:var(--bad)}.msg.ok{color:var(--ok)}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{color:var(--mut);font-weight:650;font-size:12px}.sc{overflow-x:auto}
+tr.clk{cursor:pointer}tr.clk:hover{background:var(--bg)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+.chip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;margin:2px;cursor:pointer;border:2px solid;background:transparent;color:var(--ink)}
+.lim{color:var(--bad);font-weight:800}
+.chk{max-height:160px;overflow:auto;border:1px solid var(--line);border-radius:9px;padding:6px;background:var(--bg)}
+.chk label{display:flex;gap:7px;align-items:center;margin:2px 0;color:var(--ink);font-size:13px;font-weight:500}.chk input{width:auto}
+textarea{min-height:80px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+.sub{border-top:1px solid var(--line);margin-top:14px;padding-top:6px}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
+#modal .card{max-width:640px;width:100%;max-height:88vh;overflow:auto}
+/* public */
+#dispV{display:none;height:100%;flex-direction:column;overflow:auto}
+.ticker{background:var(--tick);color:var(--tickink);overflow:hidden;white-space:nowrap;border-bottom:3px solid var(--acc);padding:10px 0;font-weight:800;font-size:clamp(14px,1.7vw,24px);letter-spacing:.04em;flex:none}
+.tk{display:inline-block;padding-left:100%;animation:tk 60s linear infinite}.tk span{margin-right:60px}
+@keyframes tk{to{transform:translateX(-100%)}}
+.teams{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:12px;flex:none}
+.tm{background:var(--card);border:1px solid var(--line);border-top:6px solid;border-radius:12px;padding:8px 12px;cursor:pointer;box-shadow:var(--sh);text-align:left;color:var(--ink);font-weight:400}
+.tm.hit{animation:pulse 1.6s ease 2}@keyframes pulse{50%{box-shadow:0 0 0 4px var(--acc)}}
+.tm h3{margin:0 0 4px;font-size:clamp(16px,1.9vw,26px)}.tm div{display:flex;justify-content:space-between;font-size:clamp(11px,1.15vw,16px);padding:1px 0}
+.ctr{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px;min-height:230px}
+.kick{color:var(--acc);font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:clamp(12px,1.5vw,20px)}
+.big{font-size:clamp(40px,8vw,130px);font-weight:900;line-height:1.05;margin:8px 0;overflow-wrap:anywhere}
+.sub2{font-size:clamp(16px,2.4vw,34px);color:var(--mut)}.sub2 b{color:var(--ink)}
+.res{font-size:clamp(18px,3vw,44px);font-weight:900;margin-top:6px}
+.bot{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:12px;padding:6px 12px calc(14px + env(safe-area-inset-bottom,0px));flex:none}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px;box-shadow:var(--sh)}
+.st b{font-size:clamp(22px,3vw,44px);display:block;line-height:1.1}.st i{font-style:normal;color:var(--mut);font-size:clamp(11px,1.1vw,15px);text-transform:uppercase;letter-spacing:.08em}
+.st .l{display:flex;justify-content:space-between;font-size:clamp(12px,1.3vw,18px);padding:2px 0}
+.un{max-height:170px;overflow:auto;margin-top:6px;display:flex;flex-wrap:wrap;gap:5px}.un span{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:clamp(11px,1.1vw,15px)}
+.one{display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:8px;align-items:end}.one label{margin-top:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.raise button.on{background:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 35%,transparent)}
+.raise button:disabled{background:var(--line);color:var(--mut);opacity:.75}
+.setsbar{display:flex;gap:6px;overflow-x:auto;padding:0 12px 8px;flex:none}
+.schip{white-space:nowrap;background:var(--card);color:var(--ink);border:1px solid var(--line);padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600}
+.schip.on{background:var(--acc);color:#fff;border-color:var(--acc)}.schip small{opacity:.7;margin-left:6px}
+#hov{position:fixed;display:none;z-index:80;width:360px;max-width:92vw;max-height:340px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:12px;font-size:12px;pointer-events:none}
+.cols{columns:2;column-gap:14px;font-size:12px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+#dUn{cursor:pointer}#dUn:hover{outline:2px solid var(--acc)}
+@media(max-width:900px){.teams{grid-template-columns:repeat(2,1fr)}.bot{grid-template-columns:1fr}}
+</style></head><body>
+
+<div id="adminV">
+<div class="bar" style="margin:0 -20px"><h1>Auction Control · Room 1 · Admin View</h1><span class="pill" id="sync">Local only</span>
+<button class="sec" onclick="view('disp')">Preview public view</button><button class="sec" onclick="copyLink()">Copy public link</button><button class="sec" onclick="fs()">Fullscreen</button></div>
+<div id="bans"></div>
+
+<div class="sec3"><h2><b>1</b> Core Auction Control</h2><div class="sg">
+ <div class="card"><h3>Draw &amp; Sell</h3>
+  <label style="margin-top:0">Active set (password-locked)</label><div class="row"><select id="setSel" disabled onchange="pickSet(this.value)" style="flex:3"></select><button id="lockB" class="sec" onclick="toggleLock()" style="flex:1">Unlock</button></div><div id="pwBox" class="row" style="display:none;margin-top:8px"><input id="pwIn" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')submitPw()"><button onclick="submitPw()">Confirm</button></div>
+  <div class="row" style="margin-top:10px"><button onclick="draw()">Draw Next Player</button><button class="sec" onclick="returnPool()">Return to pool</button></div>
+  <label><input type="checkbox" id="autoAdv" style="width:auto" checked> Auto-advance to the next set when a set is empty</label>
+  <label><input type="checkbox" id="autoDraw" style="width:auto"> Auto-draw next player after each sale / unsold</label>
+  <div class="cur" id="curBox">No player drawn</div>
+  <div class="price"><div><small>Base price</small><div id="baseP" style="font-size:20px;font-weight:800;margin-top:9px">—</div></div>
+   <div><small>Current live price (Cr, editable)</small><input id="liveP" type="number" step="0.05" min="0" oninput="setLive(this.value)"><small id="liveL"></small></div></div>
+  <div class="raise" id="raiseB"></div>
+  <div class="sub"><div class="one"><div><label>Team</label><select id="sTeam" onchange="chk()"></select></div>
+   <div><label>Winning bid (Cr)</label><input id="sBid" type="number" step="0.05" min="0" oninput="chk()"></div><div><label>Foreign player?</label><select id="sFor" onchange="chk()"><option value="no">No</option><option value="yes">Yes</option></select></div></div>
+   <div class="row" style="margin-top:8px"><button class="sec sm" onclick="useLive()">Use live price as final bid</button></div>
+   <div class="msg" id="sMsg"></div>
+   <div class="row"><button class="ok" onclick="sell()">Confirm sale</button><button class="sec" onclick="unsold()">Mark unsold</button></div></div></div>
+ <div class="card"><h3>Live team summary</h3><p class="hint">Click a team to open its sheet in Section 2.</p><div class="sc"><table id="trk"></table></div><div id="alerts" style="margin-top:10px"></div></div>
+</div></div>
+
+<div class="sec3"><h2><b>2</b> Roster &amp; Trade Desk</h2><div class="sg">
+ <div class="card"><h3>Team sheet</h3><div class="row"><div style="max-width:220px"><select id="shTeam" onchange="renderSheet()"></select></div></div>
+  <div id="chips" style="margin:10px 0"></div><div class="sc"><table id="sheet"></table></div></div>
+ <div class="card"><h3>Trade desk</h3>
+  <div class="row"><div><label style="margin-top:0">Team A</label><select id="trA" onchange="fillTrade()"></select></div><div><label style="margin-top:0">Team B</label><select id="trB" onchange="fillTrade()"></select></div></div>
+  <div class="row"><div><label>Team A gives</label><div class="chk" id="gA"></div></div><div><label>Team B gives</label><div class="chk" id="gB"></div></div></div>
+  <div class="row"><div><label>Trade option (cash)</label><select id="trD" onchange="trPrev()"></select></div><div><label>A pays B (Cr)</label><input id="trAB" type="number" step="0.05" min="0" value="0" oninput="trPrev()"></div><div><label>B pays A (Cr)</label><input id="trBA" type="number" step="0.05" min="0" value="0" oninput="trPrev()"></div></div>
+  <div class="msg" id="trMsg"></div><div class="row" style="margin-top:6px"><button id="trVf" onclick="verifyTrade()">1 · Verify Trade</button><button id="trEx" class="sec" disabled onclick="doTrade()">2 · Execute Trade</button></div><p class="hint" style="margin-top:6px">Each team may take part in at most 2 trades for the whole event. Executed trades cannot be undone. Execute unlocks only after a successful verification, and any change to the trade clears it.</p>
+  <div class="sub"><h3>Trade log</h3><div id="trLog"></div></div></div>
+</div></div>
+
+<div class="sec3"><h2><b>3</b> Data Sync</h2><div class="sg">
+ <div class="card"><h3>1 · Export to CSV</h3><p class="hint">Back up between sets and paste into Google Sheets.</p>
+  <div class="row"><div><label style="margin-top:0">What to export</label><select id="exSel" onchange="exPrev()"><option value="full">Completed sets + trades</option><option value="players">Completed sets only</option><option value="trades">Trades only</option></select></div>
+  <div><label style="margin-top:0">Completed set</label><select id="exSet" onchange="exPrev()"></select></div></div>
+  <div class="row" style="margin:10px 0"><button onclick="exCopy()">Copy CSV</button><button class="sec" onclick="exDl()">Download .csv</button></div>
+  <textarea id="exTxt" readonly onclick="this.select()"></textarea><div class="msg" id="exMsg"></div>
+  <div class="sub"><h3>Set progress</h3><div class="sc" style="max-height:230px;overflow:auto"><table id="pool"></table></div></div></div>
+ <div class="card"><h3>2 · Import sets / player sheets</h3><p class="hint">Import <b>replaces everything</b>: all sets, players, team sheets, purses and trades are erased and rebuilt from the file. Locked behind the admin password and permanently disabled once the first player is sold.</p>
+  <div id="impState"></div>
+  <div id="impPw" class="row" style="margin:8px 0"><input id="impIn" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')impUnlock()"><button onclick="impUnlock()">Unlock import</button></div>
+  <input type="file" id="apFile" accept=".xlsx,.xls,.csv,.txt" disabled><div class="msg" id="apMsg"></div>
+  <div id="impGo" class="row" style="display:none"><button class="bad" onclick="impConfirm()">Confirm: wipe &amp; import</button><button class="sec" onclick="impCancel()">Cancel</button></div>
+  <div class="sub"><h3>Manual player injection</h3><p class="hint">Fix a missed player without touching the public announcements.</p><button onclick="openManual()">Open injection tool</button></div>
+  <button class="sec bad" id="rst" onclick="reset()" style="margin-top:16px">Reset entire auction</button></div>
+ <div class="card"><h3>3 · JSON state backup &amp; recovery</h3><p class="hint">Offline failsafe: download the full auction state (sets, sales, purses, trades) as a .json file, or restore it instantly. Password-protected.</p>
+  <label style="margin-top:0">Admin password</label><input id="bkPw" type="password" placeholder="Admin password">
+  <div class="row" style="margin-top:10px"><button onclick="bkExport()">Export state (.json)</button></div>
+  <label>Restore from a backup file</label><input type="file" id="bkFile" accept=".json,application/json">
+  <label>…or paste backup JSON</label><textarea id="bkTxt"></textarea>
+  <div class="row" style="margin-top:8px"><button class="sec" onclick="bkPaste()">Restore from box</button></div><div class="msg" id="bkMsg"></div></div>
+</div></div></div>
+
+<div id="dispV"><div class="bar" id="dBar" style="display:none;flex:none"><h1>Public Display (preview)</h1><button class="sec" onclick="view('admin')">← Back to admin</button><button class="sec" onclick="fs()">Fullscreen</button></div>
+<div class="ticker"><div class="tk" id="tk"></div></div><div class="teams" id="dT"></div><div class="setsbar" id="dSets"></div>
+<div class="ctr"><div class="kick" id="dSet"></div><div class="big" id="dName"></div><div class="sub2" id="dMeta"></div><div class="res" id="dRes"></div></div>
+<div class="bot"><div class="st" id="dSetSt"></div><div class="st" id="dSold"></div><div class="st" id="dUn" onclick="showUnsold()" onmouseenter="hov(event,'UN')" onmouseleave="hov()"></div></div></div>
+<div id="hov"></div><div id="modal" onclick="if(event.target===this)closeM()"><div class="card" id="mBody"></div></div>
+
+<script>
+const DATA={"id":"xlsx-1793375538","sets":[{"name":"Marquee Set 1","players":[[1,"Jason Holder",2],[2,"Virat Kohli",2],[3,"Rabada",2],[4,"Mohammed Siraj",2],[5,"Rajat Patidar",2],[6,"Klassen",2],[7,"Ishan Kishan",2],[8,"Axar Patel",2],[9,"Abhishek Sharma",2],[10,"Vaibhav Suryavanshi",2]]},{"name":"Capped Batsman Set (CBaS) - Set 1","players":[[11,"Aiden Markram",2],[12,"Shimron Hetmyer",2],[13,"Finn Allen",2],[14,"Tristan Stubbs",2],[15,"Harry Brook",2],[16,"Dewald Brevis",2],[17,"Surya Kumar Yadav",2]]},{"name":"Capped Bowler Set (CBoS) - Set 1","players":[[18,"Noor Ahmed",2],[19,"Gurnoor Singh Brar",1],[20,"Deepak Chahar",2],[21,"Trent Boult",1],[22,"Mujeeb Ur Rahman",2],[23,"Mohammad Shami",2],[24,"Sonny Baker",1],[25,"Prasidh Krishna",1]]},{"name":"Capped AR Set (CAS) - Set 1","players":[[26,"Mitchell Santner",2],[27,"Shardul Thakur",1],[28,"Tim David",2],[29,"Shashank Singh",2],[30,"Washington Sundar",2],[31,"Jacob Bethell",1],[32,"Liam Livingstone",2],[33,"Sikandar Raza",1],[34,"Will Jacks",2]]},{"name":"Uncapped Batsman Set (UBaS) - Set 1","players":[[34,"Shubham Dubey",0.5],[35,"Abdul Samad",0.5],[36,"Aniket Verma",0.5],[37,"Rohan Kunnummal",0.5],[38,"Amandeep Khare",0.5],[39,"Angkrish Raghuvanshi",0.5],[40,"Ayush Pandey",0.5],[41,"Akshat Raghuwanshi",0.3],[42,"Shoun Roger",0.3],[43,"Karun Nair",0.3],[44,"Shaik Rasheed",0.3],[45,"Ayush Mhatre",0.3],[46,"Nehal Wadhera",0.3],[47,"Tanmay Agarwal",0.3],[48,"Avneesh Sudha",0.3],[49,"Virat Singh",0.5]]},{"name":"Uncapped Bowler Set (UBoL) - Set 1","players":[[50,"Manimaran Siddarth",0.5],[51,"Venkata Satyanarayana Penmetsa",0.5],[52,"Kulwant Khejroliya",0.5],[53,"Ashok Sharma",0.5],[54,"Abhinandan Singh",0.5],[55,"Mukesh Choudhary",0.5],[56,"Rasikh Dar",0.5],[57,"Saurabh Dubey",0.5],[58,"Jaydev Unadkat",0.5],[59,"Praful Hinge",0.5],[60,"Mohsin Khan",0.5]]},{"name":"Uncapped AR Set (UARS) - Set 1","players":[[61,"Kamlesh Nagarkoti",0.5],[62,"Saurabh Netravakur",0.5],[62,"Harpreet Brar",0.5],[63,"Atharva Ankolekar",0.5],[64,"Anukul Roy",0.5],[65,"Shams Mulani",0.5],[66,"Harsh Tyagi",0.5],[67,"Gaurav Gambhir",0.5],[68,"Darshan Nalkande",0.5],[69,"Yuvraj Chaudhary",0.5],[70,"Mohd.Arshad Khan",0.5],[71,"Emanjot Singh Chahal",0.5],[74,"Mukul Choudhary",0.5],[75,"Musheer Khan",0.5],[76,"Yudhvir Singh Charak",0.5],[77,"Nishant Sindhu",0.5],[78,"Swapnil Singh",0.5],[79,"Tejasvi Jaiswal",0.5]]},{"name":"Capped WK Set (CWKS) - Set 1","players":[[80,"Mahindra Singh Dhoni",1],[81,"Kusal Mendis",1],[82,"Ben Mcdermott",1],[83,"Aneurin Donald",1],[84,"Quinton De Kock",1]]},{"name":"Uncapped WK Set (UWKS) - Set 1","players":[[85,"Shrijith Krishnan",0.5],[86,"Luvnith Sisodia",0.5],[87,"Baba Indrajith",0.5],[88,"Vansh Bedi",0.5],[89,"Anuj Rawat",0.5],[90,"Narayan Jagadeesan",0.5],[91,"Kumar kushagra",0.5],[92,"Urvil Patel",0.5],[93,"Robin Minz",0.5],[94,"Abhishek Porel",0.5]]},{"name":"Capped Batsman Set (CBaS) - Set 2","players":[[95,"Brandon King",1],[96,"Manish Pandey",1],[97,"Mayank Agrawal",2],[98,"Prithiv Shaw",2],[99,"Ibrahim Zidran",1],[100,"Bhanuka Rajapaksa",0.5],[101,"Evin Lewis",0.5],[102,"Harry Tector",0.5],[103,"Rilee Roussow",0.5],[104,"Glenn Phillip",0.5],[105,"Matt Renshaw",0.5],[106,"Smaran Ravichandran",0.5]]},{"name":"Capped Bowler Set (CBoS) - Set 2","players":[[107,"Adam Zampa",2],[108,"Tabraiz Shamsi",1],[109,"Reece Topley",1],[110,"Eshan Malinga",2],[111,"Fazalhaq Farooqi",2],[112,"Sachindu Colombage",1],[113,"Kuldeep Yadav",2],[114,"Harshit Rana",2],[115,"Alzarri Joseph",2],[116,"Anrich Nortje",1],[117,"Kuldeep Sen",2],[118,"Kyle Jamieson",1],[119,"Nqabayomzi Peter",0.5],[120,"John Turner",1],[121,"Prince Yadav",0.5]]},{"name":"Capped AR Set (CARS) - Set 2","players":[[122,"Jamie Overton",1],[123,"Daryl Mitchell",1],[124,"Dunith Wellalage",2],[125,"Chris Green",2],[126,"Saransh Jain",1],[127,"Corbin Bosch",1],[128,"Bevan John Jacobs",1],[129,"Ayush Badoni",2],[130,"Aaron Hardie",1],[131,"Tom Curran",1],[132,"Mohammad Nabi",1],[133,"Cooper Connolly",0.5],[134,"Gulbadin Naib",0.5],[135,"Nathan Smith",0.5],[136,"Jimmy Neesham",0.5]]},{"name":"Uncapped Bowler Set (UBoL) - Set 2","players":[[137,"Anshul Kamboj",0.3],[138,"Kartik Tyagi",0.3],[139,"Ishan Porel",0.3],[140,"Raghu Sharma",0.5],[141,"Pulkit Narang",1],[142,"Yash Thakur",1],[143,"Jhathavedh Subramanyan",0.5],[144,"Yash Raj Punja",0.5],[145,"Murugan Ashwin",0.5],[146,"Shubham Agrawal",0.5],[147,"Naman Tiwari",0.3],[148,"Himanshu Sharma",0.3],[149,"Suyash Sharma",0.3],[150,"Zeeshan Ansari",0.3],[151,"Prashant Solanki",0.3]]},{"name":"Trading Break","brk":1,"players":[]},{"name":"Marquee Set 2","players":[[152,"Shubman Gill",2],[153,"Rohit Sharma",2],[154,"Prabsimran Singh",2],[155,"Bhuvneshwar Kumar",2],[156,"Shreyas Iyer",2],[157,"Jasprit Burmah",2],[158,"Josh Hazlewood",2],[159,"Dhruv Jurel",2],[160,"Jos Buttler",2],[161,"Sai Sudharshan",2]]},{"name":"Uncapped Batsman Set (UBaS) - Set 2","players":[[162,"Sameer Rizvi",1],[163,"Andre Siddarth",0.5],[164,"Anmolpreet Singh",0.5],[165,"Sanvir Singh",0.5],[166,"Yash Dhull",0.3],[167,"Priyansh Arya",1],[168,"Himmat Singh",0.5],[169,"Leus Du Plooy",0.3],[170,"Swastik Chikara",0.3],[171,"Aryan Jurel",0.3],[172,"Abhimanyu Easwaran",0.3],[173,"Pyla Avinash",0.3],[174,"Shubham Khajuria",0.3]]},{"name":"Uncapped AR Set (UARS) - Set 2","players":[[175,"Hemanth Kumar",0.3],[176,"Mayank Markande",0.3],[177,"Aman Khan",0.3],[178,"Hardik Tamore",0.3],[179,"Kumar Kartikeya",0.3],[180,"Simarjeet Singh",0.3],[181,"Ashutosh Sharma",0.3],[182,"Tripurana Vijay",0.3],[183,"Shreyas Gopal",0.5],[184,"Hrithik Shokeen",0.5],[185,"Jalaj Saxena",1],[186,"Hilton Cartwright",0.5],[187,"Vipraj Nigam",0.5]]},{"name":"Uncapped WK Set (UWK) - Set 2","players":[[188,"Bipin Saurabh",0.3],[189,"Mohammed Azharuddeen",0.3],[190,"Avanish Aravelly",0.3],[191,"Tanay Thyagarajann",0.3],[192,"B.R Sharath",0.3],[193,"Aryaman Singh Dhaliwal",0.3],[194,"Saurav Chauhan",0.3],[195,"Sanskar Rawat",0.3],[196,"L.R Chethan",0.3],[197,"S.Rithik Easwaran",0.3],[198,"Upendra Singh Yadav",0.3]]},{"name":"Capped Bowler Set (Cbos) - Set 3","players":[[199,"Varun Chakravathy",2],[200,"Sai Kishore",1],[201,"Matthew Potts",1],[202,"Rishad Hossain",1],[203,"Riley Meredith",1],[204,"Avesh Khan",1],[205,"Jeffrey Vandersay",1],[206,"Umesh Yadav",2],[207,"T.Natarajan",2],[208,"Sandeep Warrier",1],[209,"Daryn Dupavillon",1],[210,"Benjamin Sears",1],[211,"Xavier Bartlett",0.5],[212,"Richard Ngarava",0.5],[213,"Mukesh Kumar",1],[214,"Tushar Deshpande",1],[215,"Ben Dwarshuis",0.5],[216,"Lockie Ferguson",0.5],[217,"Chetan Sakariya",0.5],[218,"Taskin Ahmed",1],[219,"Obed Mccoy",2],[220,"Tanzim Hasan Sakib",1]]},{"name":"Capped AR Set (CARS) - Set 3","players":[[221,"Roston Chase",1],[222,"Zak Foulkes",1],[223,"Dan Lawrence",0.5],[224,"Charith Asalanka",2],[225,"Nitish Kumar Reddy",0.3],[226,"Nitish Rana",0.5],[227,"Kyle Myers",0.5],[228,"Jayant Yadav",0.5],[229,"Sean Abbott",0.5],[230,"Dwaine Pretorius",0.5],[231,"Mahipal Lormor",1],[232,"Matthew Shorts",2],[233,"Dasun Shanaka",0.5],[234,"Ravindra Jadeja",0.5],[235,"George Linde",0.5],[236,"Ashton Agar",0.5],[237,"Harsh Dubey",1],[238,"Lizard Williams",0.5],[239,"Naman Dhir",0.5],[240,"Alick Athanaze",0.5],[241,"Aaquib Nabi Dar",0.5]]},{"name":"Uncapped Bowler Set (UBoL) - Set 3","players":[[242,"Basil Thampi",0.3],[243,"Shreyas Chavan",0.3],[244,"Mohit Avasthi",0.3],[245,"Rajan Kumar",0.3],[246,"Vidwath Kaverappa",0.3],[247,"Arjun Tendulkar",0.3],[248,"Himanshu Singh",0.3],[249,"Akash Singh",0.3],[250,"K.M Asif",0.3],[251,"Akhil Chaudhary",0.3],[252,"Gurjapneet Singh",0.3],[253,"Vignesh Puthur",0.3],[254,"Wayne Parnell",0.3],[255,"Digvesh Rathi Singh",0.3],[256,"Andrew Tye",0.3],[257,"Nishanth Saranu",0.3],[258,"Krish Bhagat",0.5]]},{"name":"Uncapped AR Set (UARS) - Set 3","players":[[259,"Micheal Neser",0.3],[260,"Lalit Yadav",0.3],[261,"Manoj Bhandage",0.3],[262,"Pravin Dubey",0.3],[263,"Madhav Tiwari",0.3],[264,"Shivam Singh",0.3],[265,"Tanush Kotian",0.3],[266,"Mayank Dagar",0.3],[267,"Prashant Veer",0.3],[268,"Rishi Dhawan",0.3],[269,"Matthew Tromp",0.3],[270,"Kamal Mishara",0.3],[271,"Rajvardhan Hangargekar",0.3],[272,"Arshin Kulkarni",0.3],[273,"Suyash Prabhudessai",0.3],[274,"Raj Angad Bawa",0.3],[275,"K.C Cariappa",0.3]]},{"name":"Uncapped Batsman Set (UBaS) - Set 3","players":[[276,"Priyam Garg",0.3],[277,"Pukhraj Mann",0.3],[278,"Musaif Ajaz",0.3],[279,"Abhinav Manohar",0.3],[280,"Athrava Taide",0.3],[281,"Aarya Desai",0.3],[282,"Madhav Kaushik",0.3],[283,"Sachin Baby",0.3],[284,"Manan Vohra",0.3],[285,"Harnoor Pannu",0.3],[286,"Agni Chopra",0.3],[287,"Jafar Jamal",0.3],[288,"Ricky Bhui",0.3]]},{"name":"Trading Break","brk":1,"players":[]},{"name":"Marquee Set 3","players":[[289,"Pat Cummins",2],[290,"Hardik Pandya",2],[291,"Phil Salt",2],[292,"Devdutt Padikkal",2],[293,"Rashid Khan",2],[294,"Jofra Archer",2],[295,"KL Rahul",1],[296,"Sanju Samson",2],[297,"Venkatesh Iyer",2],[298,"Mitch Marsh",2]]},{"name":"Capped Batsman Set (CBaS) - Set 3","players":[[299,"Devon Conway",2],[300,"Rovman Powell",1],[301,"Travis Head",1],[302,"Pavan Rathnayake",0.5],[303,"David Miller",1],[304,"Matthew Breetzke",1.5]]},{"name":"Capped Bowler Set (CBoS) - Set 4","players":[[305,"Matt Henry",2],[306,"Tymal Mills",2],[307,"Yuzvendra Chahal",1],[308,"David Payne",1],[309,"James Anderson",2],[310,"Akeal Hosein",1]]},{"name":"Capped AR Set (CAS) - Set 4","players":[[311,"Jack Edwards",2],[312,"Shivam Dube",1],[313,"William Sutherland",1],[314,"Sanjay Krishnamurthi",1],[315,"Wiaan Mulder",1],[316,"Romario Shepherd",0.5],[317,"Micheal Bracewell",2],[318,"Daniel Mousley",1],[319,"Mark Chapman",1],[320,"Gudakesh Motie",1],[321,"Mitchell Owen",1],[322,"Janith Liyanage",0.5],[323,"Daniel Sams",0.5]]},{"name":"Capped WK Set (CWKS) - Set 2","players":[[324,"Shai Hope",2],[325,"Josh Inglis",2],[326,"Tom Banton",2],[327,"Rishabh Pant",1],[328,"Jordan Cox",1],[329,"Kusal Perera",1],[330,"Tim Seifert",2],[331,"James Vince",1]]},{"name":"Uncapped WK Set (UWKS) - Set 3","players":[[332,"Andries Gous",0.5],[333,"Anmol Malhotra",0.5],[334,"Pradosh Paul",0.5],[335,"Harvik Desai",0.5],[336,"M. Ajnas",0.5],[337,"Kunal Singh Rathore",0.5],[338,"Bhagmender Lather",0.5],[339,"Karthik Sharma",0.5],[340,"Michael Pepper",0.5],[341,"Vishnu Vinod",0.5],[342,"Muhammed Khan",0.5],[343,"Siddharth Yadav",0.5],[344,"Tom Kohler-Cadmore",0.5],[345,"Salil Arora",0.5],[346,"Ajitesh Guruswamy",0.5],[347,"Sumit Ghadigaonkar",0.5],[348,"Tejasvi Dahiya",0.5],[349,"Vishnu Solanki",0.5],[350,"Dinesh Bana",0.5],[351,"Tejasvi Singh",0.5]]},{"name":"Uncapped Batsman Set (UBaS) - Set 4","players":[[352,"Tushar Raheja",0.5],[353,"Rahul Tripathi",0.5],[354,"Josh Philippe",0.5],[355,"Sam Billings",0.5],[356,"Andre Fletcher",0.5],[357,"Joshua Brown",0.5],[358,"Saiteja Mukkamalla",0.5],[359,"Ashton Turner",0.5],[360,"Ashish Dahariya",0.5],[361,"Kiran Chormale",0.5],[362,"Atharva Kale",1],[363,"Rassie Van Der Dussen",1],[364,"Sarthak Ranjan",0.5],[365,"Salman Nizar",0.5],[366,"Abhishek Nair",1],[367,"harnoor singh",0.5]]},{"name":"Uncapped AR Set (UARS) - Set 4","players":[[368,"Rohit Rayudu",0.3],[369,"Ramakrishna Ghosh",0.3],[370,"Mayank Rawat",0.3],[371,"Ripal Patel",0.3],[372,"Khrievitso Kense",0.3],[373,"Tripuresh Singh",0.3],[374,"Mohamed Ali",0.3],[375,"Girinath Reddy",0.3],[376,"Baba Aparajith",0.3],[377,"Sanjay Yadav",0.3],[378,"Umang Kumar",0.3],[379,"Vivrant Sharma",0.3],[380,"Sumit Kumar Beniwal",0.3],[381,"Mukhtar Hussain",0.3],[382,"Yajas Sharma",0.3],[383,"Manvanth Kumar L",0.5],[384,"Kartik Chadha",0.5],[385,"Karim Janat",0.5],[386,"Rahul tewaita",0.5]]},{"name":"Uncapped Bowlers Set (UBoS) - Set 4","players":[[387,"Yuvraj Chudasama",0.3],[388,"Sakib Hussain",0.3],[389,"Sahil Bhaskar",0.5],[390,"Abhilash Shetty",0.3],[391,"Prince choudhary",0.3],[392,"Mohit Rathee",0.5],[393,"Bailapudi Yeswanth",0.3],[394,"Jagadeesha Suchith",0.3],[395,"Himanshu Chauhan",0.3],[396,"Lahiru Kumara",0.3],[397,"Raghav Goyal",0.5],[398,"Vaibhav Arora",0.3],[399,"Ashwani Kumar",0.3],[400,"Deepak Devadiga",0.3],[401,"Kuldip Yadav",0.3],[402,"K.M. Asif",0.5],[403,"Sushant Mishra",0.5],[404,"Vyshak Vijaykumar",0.3]]},{"name":"Capped AR Set (CARS) - Set 5","players":[[405,"Harshal Patel",0.5],[406,"Odean Smith",0.5],[407,"Rachin Ravindra",0.5],[408,"Azmatullah Omarzai",0.5],[409,"Kamindu Mendis",0.5],[410,"Manav Suthar",0.5],[411,"Suryansh Shedge",1],[412,"Marco Jansen",1],[413,"Keshav Maharaj",1],[414,"Marcus Stoinis",2],[415,"Sarfaraz Khan",2],[416,"Liam Dawson",1],[417,"Sam Curran",1],[418,"Shahbaz Ahmed",2],[419,"Qais Ahmed",2],[420,"Keemo Paul",2],[421,"Brandon McMullen",2],[422,"Matthew Forde",2],[423,"Rehan Ahmed",2],[424,"Brydon Carse",1],[425,"Dominic Drakes",1],[426,"Duan Jansen",0.3]]},{"name":"Trading Break","brk":1,"players":[]},{"name":"Marquee Set 4","players":[[427,"Donovan Ferriera",2],[428,"Arshdeep Singh",2],[429,"Krunal Pandya",2],[430,"Nicholas Pooran",2],[431,"Sunil Narine",2],[432,"Riyan Parag",2],[433,"Rinku Singh",2],[434,"Mitchell Starc",2],[435,"Ryan Rickelton",2],[436,"Tilak Varma",2]]},{"name":"Capped Batsman Set (CBaS) - Set 4","players":[[437,"Sherfane Rutherford",2],[438,"Jake Fraser-McGurk",2],[439,"Sediqullah Atal",2],[440,"Najibullah Zadran",2],[441,"Will Young",2],[442,"Ruturaj Gaikwad",1],[443,"Yashasvi Jaiswal",1],[444,"Mikyle Louis",1],[445,"Steve Smith",1],[446,"Pathum Nissanka",1]]},{"name":"Capped Bowler Set (CBoS) - Set 5","players":[[447,"Rahul Chahar",2],[448,"Dilshan Madushanka",1],[449,"Tanveer Sangha",1],[450,"Nandre Burger",2],[451,"William O'Rourke",1],[452,"Nahid Rana",2],[453,"Chris Jordan",2],[454,"Matheesha Pathirana",2],[455,"Kwena Maphaka",2],[456,"Jason Behrendroff",1],[457,"Khaleel Ahmed",1],[458,"Ravi Bishnoi",1],[459,"Luke Wood",1],[460,"Theekshana",1],[461,"Mustafizur Rahman",2],[462,"Sandeep Sharma",1],[463,"Waqar Salamkheil",2],[464,"Adil Rashid",1],[465,"Spencer Johnson",1],[466,"Gerald Coetzee",1],[467,"Adam Milne",1]]},{"name":"Capped WK Set (CWKS) - Set 3","players":[[468,"Lhuan-Dre Pretorius",1],[469,"Alex Carey",2],[470,"Johnson Charles",1],[471,"Ollie Pope",1],[472,"Jitesh Sharma",1],[473,"Litton Das",1],[474,"Rahmanullah Gurbaz",1],[475,"Jonny Bairstow",1],[476,"Kyle Verreynne",1],[477,"Tom Latham",1]]},{"name":"Capped Bowler Set (CBoS) - Set 6","players":[[478,"Josh Tongue",1],[479,"Navdeep Saini",1],[480,"Vijayakanth Viyaskanth",1],[481,"Shivam Mavi",1],[482,"Olly stone",1],[483,"Wanindu Hasaranga",1],[484,"Nuwan Thushara",1],[485,"Lance Morris",1],[486,"Umran Malik",0.5],[487,"Akash Deep",0.5],[488,"Lungi Ngidi",1],[489,"Nathan Ellis",1],[490,"Blessing Muzarabani",1],[491,"Josh Little",1],[492,"Jai Moondra",1],[493,"Allah Ghazanfar",2],[494,"Richard Gleeson",2],[495,"Mayank Yadav",0.5],[496,"Dushmantha Chameera",0.5],[497,"Shamar Joseph",0.5],[498,"Shoriful Islam",0.3],[499,"Ottneil Baartman",0.3],[500,"Jhye Richardson",1]]}]};
+const TEAMS=[['CSK','#e5b800'],['MI','#2f7bff'],['SRH','#ff7a1a'],['KKR','#8b4bd6'],['RCB','#e5233d'],['PBKS','#ff4f9a'],['DC','#1ea7e8'],['RR','#e056c0'],['GT','#4d7ea8'],['LSG','#18b8a0']];
+const COL=Object.fromEntries(TEAMS),KEY='auction_dash_aucroom1_v1',MAXSQ=25,MAXF=8,PURSE=120,SET_PW='admin2026',MAXTR=2;
+const $=i=>document.getElementById(i),r2=x=>Math.round(x*100)/100;
+const cr=x=>x==null||isNaN(x)?'—':(x<1&&x>0?Math.round(x*100)+' Lakh':r2(x)+' Cr');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lab=n=>n.replace(/\s*\([^)]*\)/g,'').replace(/\s+Sets?\s+-\s+/i,' · ').replace(/^Round Name\s*[:\-]?\s*/i,'').trim();
+let S,banners=[],bid=0,ADMIN=true,doc=null,mode='admin',modalFn=null,wT=null;
+function fresh(){let id=0;const players=[];DATA.sets.forEach((s,i)=>s.players.forEach(p=>players.push({id:++id,set:i,no:p[0],name:p[1],base:p[2],status:'avail',team:null,price:null,foreign:false,via:'',hist:[]})));
+ return{v:Date.now(),dataId:DATA.id,sets:DATA.sets.map(s=>({name:s.name,brk:!!s.brk})),players,teams:Object.fromEntries(TEAMS.map(t=>[t[0],{purse:PURSE}])),current:null,curSet:0,live:null,raises:[],trades:[],last:'',lastName:'',lastTeam:null}}
+function loadLocal(){try{const j=localStorage.getItem(KEY);if(j)return JSON.parse(j)}catch(e){}return null}
+function save(){if(!ADMIN)return;S.v=(S.v||0)+1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}clearTimeout(wT);wT=setTimeout(push,400)}
+function push(){if(!doc)return;doc.set({json:JSON.stringify(S),v:S.v,t:Date.now()}).then(()=>{$('sync').textContent='Live sync on';$('sync').className='pill on'},()=>{$('sync').textContent='Sync failed';$('sync').className='pill'})}
+const P=id=>S.players.find(p=>p.id===id),own=t=>S.players.filter(p=>p.team===t);
+const st=t=>{const o=own(t);return{n:o.length,f:o.filter(p=>p.foreign).length,purse:S.teams[t].purse}};
+const soldNames=()=>new Set(S.players.filter(p=>p.team).map(p=>p.name.trim().toLowerCase()));
+const trLeft=t=>Math.max(0,MAXTR-S.trades.filter(x=>x.a===t||x.b===t).length);
+const inS=(p,i)=>i==='U'?!!p.wasUns:p.set===i;
+const setPlayers=i=>S.players.filter(p=>inS(p,i));
+const setName=i=>i==='U'?'Unsold Players':lab(S.sets[i].name);
+const avail=i=>{const sn=soldNames();return S.players.filter(p=>(i==='U'?p.status==='unsold':p.set===i&&p.status==='avail')&&p.id!==S.current&&!sn.has(p.name.trim().toLowerCase()))};
+let setUnlocked=false,impUnlocked=false,pend=null;
+const started=()=>!!S.started||S.players.some(p=>p.team);
+function impUi(){const d=started();$('apFile').disabled=d||!impUnlocked;$('impPw').style.display=(d||impUnlocked)?'none':'flex';$('impState').innerHTML=d?'<div class="ban bad" style="box-shadow:none">Import is permanently disabled: a player has already been sold.</div>':impUnlocked?'<div class="msg ok">Import unlocked. Choose a file.</div>':'<div class="msg">Locked: enter the admin password to enable import.</div>'}
+function impUnlock(){if($('impIn').value===SET_PW){impUnlocked=true;$('impIn').value='';banner('Import unlocked.','good');renderAdmin()}else{banner('Incorrect admin password.');$('impIn').value=''}}
+function addPlayers(list){const m=$('apMsg'),rows=list.map(r=>[r[0]?String(r[0]).trim():'Imported Set',String(r[1]??'').trim(),r[2]]).filter(r=>r[1]);
+ if(!rows.length){pend=null;m.className='msg bad';m.textContent='No players found in that file.';$('impGo').style.display='none';return}
+ pend=rows;m.className='msg bad';m.textContent=`Ready: ${new Set(rows.map(r=>r[0])).size} sets / ${rows.length} players. Confirming will ERASE all current sets, players, team sheets, purses and trades.`;$('impGo').style.display='flex'}
+function impCancel(){pend=null;$('impGo').style.display='none';$('apMsg').textContent=''}
+function impConfirm(){if(!pend||started()||!impUnlocked){banner('Import is not allowed.');return}
+ const sets=[],idx=new Map(),players=[];let id=0;
+ pend.forEach(([sn,n,b])=>{if(!idx.has(sn)){idx.set(sn,sets.length);sets.push({name:sn,brk:false})}const bv=parseFloat(b);players.push({id:++id,set:idx.get(sn),no:id,name:n,base:isNaN(bv)?null:bv,status:'avail',team:null,price:null,foreign:false,via:'',hist:[]})});
+ S={v:(S.v||0)+1,sets,players,teams:Object.fromEntries(TEAMS.map(t=>[t[0],{purse:PURSE}])),current:null,curSet:0,live:null,raises:[],trades:[],last:'',lastName:'',lastTeam:null,started:false,dataId:DATA.id};
+ const cnt=`${sets.length} sets / ${players.length} players`;pend=null;impUnlocked=false;tvSig=null;$('impGo').style.display='none';save();renderAll();$('apMsg').className='msg ok';$('apMsg').textContent=`Imported ${cnt}. All old data was erased.`}
+function openManual(){modalFn=null;const tt=TEAMS.map(t=>`<option>${t[0]}</option>`).join(''),ss=S.sets.map((x,i)=>x.brk?'':`<option value="${i}">${esc(lab(x.name))}</option>`).join('');
+ $('mBody').innerHTML=`<h3 style="font-size:20px;margin:0 0 4px">Manual player injection</h3><p class="hint">Background tool for missed players. Nothing here is announced on the public display.</p>
+<div class="sub"><h3>Option 1 · Inject into a team sheet</h3><div class="row"><div><label>Player name</label><input id="mjName"></div><div><label>Final price (Cr)</label><input id="mjPrice" type="number" step="0.05" min="0"></div></div><div class="row"><div><label>Team</label><select id="mjTeam">${tt}</select></div><div><label>Foreign?</label><select id="mjFor"><option value="no">No</option><option value="yes">Yes</option></select></div></div><div class="msg" id="mjMsg"></div><button onclick="manualInject()">Inject into team</button></div>
+<div class="sub"><h3>Option 2 · Append to the pool</h3><div class="row"><div><label>Player name</label><input id="mpName"></div><div><label>Base price (Cr)</label><input id="mpBase" type="number" step="0.05" min="0"></div></div><div class="row"><div><label>Existing set</label><select id="mpSet">${ss}</select></div><div><label>…or new custom set</label><input id="mpNew" placeholder="added at the end"></div></div><div class="msg" id="mpMsg"></div><button onclick="manualAppend()">Append to set</button></div><button class="sec" style="margin-top:14px" onclick="closeM()">Close</button>`;$('modal').style.display='flex'}
+function manualInject(){const m=$('mjMsg'),bad=t=>{m.className='msg bad';m.textContent=t},n=$('mjName').value.trim(),pr=r2(parseFloat($('mjPrice').value)),t=$('mjTeam').value,f=$('mjFor').value==='yes';
+ if(!n||isNaN(pr)||pr<0)return bad('Enter the player name and a final price.');
+ let p=S.players.find(x=>x.name.trim().toLowerCase()===n.toLowerCase());
+ if(p&&p.team)return bad(`${p.name} is already on ${p.team}.`);if(p&&p.id===S.current)return bad('That player is on the block right now.');
+ const o=issues(t,pr,f);if(o.length)return bad(o.join(' '));
+ if(!p){let h=S.sets.findIndex(x=>x.hid);if(h<0){S.sets.push({name:'Manual Injections',brk:true,hid:true});h=S.sets.length-1}p={id:Math.max(0,...S.players.map(x=>x.id))+1,set:h,no:Math.max(0,...S.players.map(x=>+x.no||0))+1,name:n,base:null,status:'avail',team:null,price:null,foreign:false,via:'',hist:[]};S.players.push(p)}
+ Object.assign(p,{status:'sold',team:t,price:pr,foreign:f,via:'Manual'});S.teams[t].purse=r2(S.teams[t].purse-pr);S.started=true;
+ m.className='msg ok';m.textContent=`${p.name} added to ${t} for ${cr(pr)}.`;$('mjName').value='';$('mjPrice').value='';save();renderAll()}
+function manualAppend(){const m=$('mpMsg'),bad=t=>{m.className='msg bad';m.textContent=t},n=$('mpName').value.trim(),bv=parseFloat($('mpBase').value),nw=$('mpNew').value.trim();
+ if(!n)return bad('Enter the player name.');if(S.players.some(p=>p.name.trim().toLowerCase()===n.toLowerCase()))return bad('A player with that name already exists.');
+ let i=+$('mpSet').value;if(nw){i=S.sets.findIndex(x=>!x.brk&&x.name.toLowerCase()===nw.toLowerCase());if(i<0){S.sets.push({name:nw,brk:false});i=S.sets.length-1}}
+ if(isNaN(i)||!S.sets[i])return bad('Choose a set.');
+ S.players.push({id:Math.max(0,...S.players.map(p=>p.id))+1,set:i,no:Math.max(0,...S.players.map(p=>+p.no||0))+1,name:n,base:isNaN(bv)?null:bv,status:'avail',team:null,price:null,foreign:false,via:'',hist:[]});
+ m.className='msg ok';m.textContent=`${n} added to ${lab(S.sets[i].name)}; they can now be drawn.`;$('mpName').value='';save();renderAll()}
+function toggleLock(){if(setUnlocked){setUnlocked=false;renderAdmin();return}$('pwBox').style.display='flex';$('pwIn').focus()}
+function submitPw(){if($('pwIn').value===SET_PW){setUnlocked=true;$('pwBox').style.display='none';$('pwIn').value='';banner('Set selection unlocked. It re-locks after you pick a set.','good');renderAdmin()}else{banner('Incorrect admin password.');$('pwIn').value=''}}
+function pickSet(v){S.curSet=v==='U'?'U':+v;setUnlocked=false;save();renderAll()}
+function setHtml(i,c){const pl=setPlayers(i),av=new Set(avail(i).map(p=>p.id)),cur=P(S.current),bl=cur&&inS(cur,i)?cur:null;
+ const left=pl.filter(p=>av.has(p.id)),sold=pl.filter(p=>p.status==='sold'),un=pl.filter(p=>p.status==='unsold'&&!av.has(p.id)&&(!bl||p.id!==bl.id));
+ const li=(p,x)=>`<li>${esc(p.name)} <span style="color:var(--mut)">${x||''}</span></li>`;
+ const blk=(t,col,a,fn)=>a.length?`<h4 style="margin:10px 0 4px;color:${col}">${t} (${a.length})</h4><ul class="cols" style="margin:0;padding-left:18px">${a.map(fn).join('')}</ul>`:'';
+ return`<h3 style="font-size:${c?14:20}px;margin:0">${esc(setName(i))}</h3><div class="hint">${pl.length} players · ${left.length+(bl?1:0)} still available · ${sold.length} sold</div>${bl?`<div style="margin:6px 0"><b style="color:var(--acc)">ON THE BLOCK:</b> ${esc(bl.name)}</div>`:''}${blk('Still available','var(--acc2)',left,p=>li(p,cr(p.base??0)))}${blk('Sold','var(--ok)',sold,p=>li(p,`${p.team} · ${cr(p.price)}`))}${blk('Unsold','var(--bad)',un,p=>li(p,''))}${pl.length?'':'<p class="hint">No players in this set yet.</p>'}${c?'':'<button style="margin-top:12px" onclick="closeM()">Close</button>'}`}
+function unsoldHtml(c){const u=S.players.filter(p=>p.status==='unsold');return`<h3 style="font-size:${c?14:20}px;margin:0 0 8px">Unsold players (${u.length} of ${S.players.length})</h3><div class="sc" style="${c?'max-height:240px;overflow:auto':''}"><table><tr><th>#</th><th>Player</th><th>Set</th><th>P.No</th><th>Base</th></tr>${u.map((p,i)=>`<tr><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${esc(lab(S.sets[p.set].name))}</td><td>${p.no}</td><td>${cr(p.base??0)}</td></tr>`).join('')||'<tr><td colspan="5" class="hint">No unsold players yet.</td></tr>'}</table></div>${c?'':'<button style="margin-top:12px" onclick="closeM()">Close</button>'}`}
+function hov(e,i){const h=$('hov');if(!e){h.style.display='none';return}if(!matchMedia('(hover:hover)').matches)return;h.innerHTML=i==='UN'?unsoldHtml(true):setHtml(i,true);h.style.display='block';const w=h.offsetWidth,hh=h.offsetHeight;h.style.left=Math.max(8,Math.min(e.clientX-20,innerWidth-w-8))+'px';h.style.top=(e.clientY+hh+24>innerHeight?Math.max(8,e.clientY-hh-14):e.clientY+16)+'px'}
+const showSet=i=>{hov();openM(()=>setHtml(i,false))};
+const showUnsold=()=>{hov();openM(()=>unsoldHtml(false))};
+function banner(msg,kind='bad'){banners.unshift({msg,kind,id:++bid});banners=banners.slice(0,4);rBan();const b=bid;setTimeout(()=>{banners=banners.filter(x=>x.id!==b);rBan()},25000)}
+function rBan(){$('bans').innerHTML=banners.map(b=>`<div class="ban ${b.kind}"><span>${esc(b.msg)}</span><button onclick="banners=banners.filter(x=>x.id!==${b.id});rBan()">×</button></div>`).join('')}
+function view(v){if(!ADMIN)v='disp';mode=v;$('adminV').style.display=v==='admin'?'block':'none';$('dispV').style.display=v==='disp'?'flex':'none';$('dBar').style.display=v==='disp'&&ADMIN?'flex':'none';document.body.style.overflow=v==='disp'?'hidden':'auto';if(v==='disp')document.body.style.overflow='auto';renderAll();try{history.replaceState(null,'',v==='disp'?'#display':'#admin')}catch(e){}}
+function fs(){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}}
+function copyLink(){const u=location.href.split('#')[0]+'#display';const t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(e){}t.remove();try{navigator.clipboard.writeText(u)}catch(e){}banner('Public link copied: '+u,'good')}
+function closeM(){$('modal').style.display='none';modalFn=null}
+function openM(fn){modalFn=fn;$('mBody').innerHTML=fn();$('modal').style.display='flex'}
+
+/* ---- bidding ---- */
+const inc=x=>{const L=Math.round(x*100);return L<200?0.10:L<500?0.20:0.25};
+const lakhTxt=x=>x==null?'':`= ${Math.round(x*100)} Lakh`;
+function setLive(v){const n=parseFloat(v);S.live=isNaN(n)?null:r2(Math.max(0,n));$('liveL').textContent=lakhTxt(S.live);save();renderAll()}
+function raise(l){const p=P(S.current);if(!p)return;let x=S.live??p.base??0;if(Math.round(inc(x)*100)!==l){banner(`+${l} Lakh is not valid at ${cr(x)}.`,'warn');return}S.raises.push(x);S.live=r2(x+l/100);save();renderAll()}
+function undoRaise(){if(!S.raises.length)return;S.live=S.raises.pop();save();renderAll()}
+function useLive(){if(S.live!=null){$('sBid').value=S.live;chk()}}
+function draw(){if(S.current){banner('A player is already on the block. Sell, mark unsold or return them first.','warn');return}
+ let i=S.curSet,l=avail(i);
+ if(!l.length){if($('autoAdv').checked){let n=-1;for(let j=i+1;j<S.sets.length;j++)if(!S.sets[j].brk&&avail(j).length){n=j;break}if(n<0&&i!=='U'&&avail('U').length)n='U';if(n<0){banner('No players left to draw in later sets.','warn');return}S.curSet=i=n;l=avail(i)}else{banner('This set has no players left. Choose another set.','warn');return}}
+ const p=l[Math.floor(Math.random()*l.length)];S.current=p.id;S.live=p.base??0;S.raises=[];S.last='';$('sBid').value='';$('sFor').value='no';save();renderAll()}
+function issues(t,b,f){const s=st(t),o=[];if(b>s.purse)o.push(`PURSE LIMIT: ${t} has only ${cr(s.purse)} left but the bid is ${cr(b)}.`);if(s.n+1>MAXSQ)o.push(`SQUAD LIMIT: ${t} already has ${MAXSQ}/${MAXSQ} players; a 26th is not allowed.`);if(f&&s.f+1>MAXF)o.push(`FOREIGN QUOTA: ${t} already has ${MAXF}/${MAXF} foreign players; a 9th is not allowed.`);return o}
+function chk(){const t=$('sTeam').value,b=parseFloat($('sBid').value),m=$('sMsg');if(!S.current||isNaN(b)){m.className='msg';m.textContent='';return}const o=issues(t,b,$('sFor').value==='yes');m.className='msg '+(o.length?'bad':'ok');m.textContent=o.length?o.join(' '):`OK: ${t} will have ${cr(st(t).purse-b)} left.`}
+function resetBid(){S.live=null;S.raises=[];$('sBid').value='';$('sFor').value='no'}
+function sell(){const p=P(S.current);if(!p){banner('Draw a player first.','warn');return}const t=$('sTeam').value,b=r2(parseFloat($('sBid').value)),f=$('sFor').value==='yes';
+ if(isNaN(b)||b<=0){banner('Enter the final winning bid first.','warn');return}
+ const o=issues(t,b,f);if(o.length){o.forEach(x=>banner(x));return}
+ Object.assign(p,{status:'sold',team:t,price:b,foreign:f,via:'Auction'});S.started=true;S.teams[t].purse=r2(S.teams[t].purse-b);S.current=null;S.last=`SOLD to ${t} for ${cr(b)}`;S.lastName=p.name;S.lastTeam=t;resetBid();
+ banner(`${p.name} → ${t} for ${cr(b)}`,'good');save();renderAll();if($('autoDraw').checked)draw()}
+function unsold(){const p=P(S.current);if(!p)return;p.status='unsold';p.wasUns=true;S.current=null;S.last='UNSOLD';S.lastName=p.name;S.lastTeam=null;resetBid();save();renderAll();if($('autoDraw').checked)draw()}
+function returnPool(){S.current=null;resetBid();save();renderAll()}
+function readd(i){S.players.forEach(p=>{if(p.set===i&&p.status==='unsold')p.status='avail'});save();renderAll()}
+function undoSale(id){const p=P(id);if(!p||p.hist.length)return;S.teams[p.team].purse=r2(S.teams[p.team].purse+p.price);Object.assign(p,{status:'avail',team:null,price:null,foreign:false,via:''});save();renderAll();banner(`Sale of ${p.name} reversed; player returned to pool.`,'warn')}
+
+/* ---- trades ---- */
+function tcheck(a,b,gA,gB,cash){const A=st(a),B=st(b),fa=gA.filter(i=>P(i).foreign).length,fb=gB.filter(i=>P(i).foreign).length;
+ const after={a:{n:A.n-gA.length+gB.length,f:A.f-fa+fb,purse:r2(A.purse-cash)},b:{n:B.n-gB.length+gA.length,f:B.f-fb+fa,purse:r2(B.purse+cash)}},o=[];
+ [[a,after.a],[b,after.b]].forEach(([t,x])=>{if(x.n>MAXSQ)o.push(`${t} would have ${x.n} players (max ${MAXSQ}).`);if(x.f>MAXF)o.push(`${t} would have ${x.f} foreign players (max ${MAXF}).`);if(x.purse<0)o.push(`${t} purse would drop to ${cr(x.purse)} (cannot go below 0).`)});
+ gA.forEach(i=>{if(P(i).team!==a)o.push(`Ownership: ${P(i).name} is not on ${a}.`)});gB.forEach(i=>{if(P(i).team!==b)o.push(`Ownership: ${P(i).name} is not on ${b}.`)});return{o,before:{a:A,b:B},after}}
+const sel=id=>[...document.querySelectorAll('#'+id+' input:checked')].map(x=>+x.value);
+function trState(){const a=$('trA').value,b=$('trB').value,mode=$('trD').value,g=id=>Math.max(0,parseFloat($(id).value)||0),ab=(mode==='ab'||mode==='both')?g('trAB'):0,ba=(mode==='ba'||mode==='both')?g('trBA'):0;return{a,b,mode,gA:sel('gA'),gB:sel('gB'),ab,ba,cash:r2(ab-ba)}}
+let tvSig=null;
+const sig=()=>{const s=trState();return JSON.stringify([s,st(s.a),st(s.b)])};
+function trPrev(){const s=trState(),m=$('trMsg');$('trAB').disabled=!(s.mode==='ab'||s.mode==='both');$('trBA').disabled=!(s.mode==='ba'||s.mode==='both');
+ if(tvSig&&tvSig!==sig())tvSig=null;const ok=!!tvSig;const lim=trLeft(s.a)<1||trLeft(s.b)<1;$('trEx').disabled=!ok||lim;$('trVf').disabled=lim;$('trEx').className=ok?'ok':'sec';$('trVf').className=ok?'sec':'';
+ if(ok){m.className='msg ok';m.textContent='Verified. Execute is unlocked; executed trades cannot be undone.'}else{m.className='msg';m.textContent=(trLeft(s.a)<1||trLeft(s.b)<1)?`${trLeft(s.a)<1?s.a:s.b} has used both trades (0/${MAXTR} left); no further trades allowed.`:s.a===s.b?'Pick two different teams.':'Step 1: click “Verify Trade” to check purses, squad slots, foreign quotas and ownership.'}}
+function verifyTrade(){const s=trState();{const z=trState(),bad=[z.a,z.b].filter(t=>trLeft(t)<1);if(bad.length){banner(`TRADE REJECTED: ${bad.join(' and ')} ${bad.length>1?'have':'has'} already used both of ${bad.length>1?'their':'its'} ${MAXTR} trades.`);return}}if(s.a===s.b){banner('TRADE REJECTED: choose two different teams.');return}if(!s.gA.length&&!s.gB.length&&!s.ab&&!s.ba){banner('TRADE REJECTED: nothing to trade.','warn');return}
+ const c=tcheck(s.a,s.b,s.gA,s.gB,s.cash);if(c.o.length){tvSig=null;banner('TRADE REJECTED: '+c.o.join(' '));trPrev();$('trMsg').className='msg bad';$('trMsg').textContent='Rejected: '+c.o.join(' ');return}
+ tvSig=sig();trPrev();$('trMsg').textContent=`Verified. After: ${s.a} ${c.after.a.n} pl / ${c.after.a.f} foreign / ${cr(c.after.a.purse)}; ${s.b} ${c.after.b.n} pl / ${c.after.b.f} foreign / ${cr(c.after.b.purse)}. Execute is unlocked; this cannot be undone.`}
+function trPrevOld(){const{a,b,gA,gB,cash}=trState(),m=$('trMsg');if(a===b){m.className='msg bad';m.textContent='Pick two different teams.';return}if(!gA.length&&!gB.length&&!cash){m.className='msg';m.textContent='';return}const c=tcheck(a,b,gA,gB,cash);m.className='msg '+(c.o.length?'bad':'ok');m.textContent=c.o.length?'Would be rejected: '+c.o.join(' '):`Valid. After: ${a} ${c.after.a.n} pl / ${c.after.a.f} foreign / ${cr(c.after.a.purse)}; ${b} ${c.after.b.n} pl / ${c.after.b.f} foreign / ${cr(c.after.b.purse)}.`}
+function doTrade(){const{a,b,gA,gB,cash,ab,ba}=trState();{const z=trState(),bad=[z.a,z.b].filter(t=>trLeft(t)<1);if(bad.length){banner(`TRADE REJECTED: ${bad.join(' and ')} ${bad.length>1?'have':'has'} already used both of ${bad.length>1?'their':'its'} ${MAXTR} trades.`);return}}if(!tvSig||tvSig!==sig()){banner('Verify the trade first (step 1).','warn');return}if(a===b){banner('TRADE REJECTED: choose two different teams.');return}if(!gA.length&&!gB.length&&!cash){banner('TRADE REJECTED: nothing to trade.','warn');return}
+ const c=tcheck(a,b,gA,gB,cash);if(c.o.length){banner('TRADE REJECTED: '+c.o.join(' '));trPrev();return}
+ const no=S.trades.length+1;gA.forEach(i=>{const p=P(i);p.team=b;p.hist.push({no,with:a})});gB.forEach(i=>{const p=P(i);p.team=a;p.hist.push({no,with:b})});
+ S.teams[a].purse=c.after.a.purse;S.teams[b].purse=c.after.b.purse;
+ S.trades.push({no,a,b,gA:gA.map(i=>P(i).name),gB:gB.map(i=>P(i).name),cash,ab,ba,before:c.before,after:c.after,at:new Date().toLocaleString()});
+ {const tt=S.trades[S.trades.length-1],L=x=>x.length?x.join(', '):'no players',cs=ab&&ba?`${a} pays ${b} ${cr(ab)} and ${b} pays ${a} ${cr(ba)}`:ab?`${a} pays ${b} ${cr(ab)}`:ba?`${b} pays ${a} ${cr(ba)}`:'no cash';S.tradeNote={no,at:Date.now(),text:`TRADE T${no} COMPLETED: ${a} gives ${L(tt.gA)} · ${b} gives ${L(tt.gB)} · ${cs}`}}
+ tvSig=null;$('trAB').value=0;$('trBA').value=0;S.lastTeam=null;save();renderAll();banner(`Trade T${no} completed between ${a} and ${b}.`,'good')}
+function tradeHtml(no){const t=S.trades.find(x=>x.no===no);if(!t)return'';const L=a=>a.length?a.map(esc).join(', '):'—';
+ return`<h3 style="font-size:18px">Trade T${t.no} · ${esc(t.at)}</h3><p><span class="dot" style="background:${COL[t.a]}"></span><b>${t.a}</b> ⇄ <span class="dot" style="background:${COL[t.b]}"></span><b>${t.b}</b></p>
+ <p><b>${t.a} gave:</b> ${L(t.gA)}<br><b>${t.b} gave:</b> ${L(t.gB)}<br><b>Cash:</b> ${(t.ab||t.ba)?`${t.a} paid ${t.b} ${cr(t.ab||0)}; ${t.b} paid ${t.a} ${cr(t.ba||0)}`:t.cash>0?`${t.a} paid ${t.b} ${cr(t.cash)}`:t.cash<0?`${t.b} paid ${t.a} ${cr(-t.cash)}`:'none'}</p>
+ <table><tr><th>Team</th><th>Players</th><th>Foreign</th><th>Purse</th></tr>${[['a',t.a],['b',t.b]].map(([k,n])=>`<tr><td>${n}</td><td>${t.before[k].n} → ${t.after[k].n}</td><td>${t.before[k].f} → ${t.after[k].f}</td><td>${cr(t.before[k].purse)} → ${cr(t.after[k].purse)}</td></tr>`).join('')}</table><button style="margin-top:12px" onclick="closeM()">Close</button>`}
+const showTrade=no=>openM(()=>tradeHtml(no));
+function teamHtml(t){const s=st(t),o=own(t),top=o.filter(p=>p.price!=null).sort((a,b)=>b.price-a.price)[0];
+ return`<h3 style="font-size:20px"><span class="dot" style="background:${COL[t]}"></span>${t} · Squad</h3>
+ <div class="row" style="margin:8px 0"><div><small class="hint">Players</small><br><b>${s.n}/${MAXSQ}</b></div><div><small class="hint">Purse left</small><br><b>${cr(s.purse)}</b></div><div><small class="hint">Foreign</small><br><b>${s.f}/${MAXF}</b></div><div><small class="hint">Trades left</small><br><b>${trLeft(t)}/${MAXTR}</b></div><div><small class="hint">Top buy</small><br><b>${top?esc(top.name):'—'}</b></div></div>
+ <div class="sc"><table><tr><th>#</th><th>Player</th><th>Price</th><th>Foreign</th><th>Via</th></tr>${o.map((p,i)=>{const h=p.hist[p.hist.length-1],c=h?COL[h.with]:null;return`<tr ${c?`style="background:color-mix(in srgb,${c} 22%,transparent)"`:''}><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${cr(p.price)}</td><td>${p.foreign?'Yes':'—'}</td><td>${p.via}${p.hist.map(x=>` <span class="chip" style="border-color:${COL[x.with]};padding:0 6px" onclick="showTrade(${x.no})">T${x.no}</span>`).join('')}</td></tr>`}).join('')||'<tr><td colspan="5" style="color:var(--mut)">No players bought yet.</td></tr>'}</table></div><button style="margin-top:12px" onclick="closeM()">Close</button>`}
+const showTeam=t=>openM(()=>teamHtml(t));
+
+/* ---- import / add ---- */
+function parseText(t){return t.split('\n').map(x=>x.trim()).filter(Boolean).map(l=>{if(l.includes('|'))return l.split('|').map(x=>x.trim());const q=l.split(',').map(x=>x.trim().replace(/^"|"$/g,''));return q.length>=3?q:[null,q[0],q[1]]})}
+function parseRows(rows){const out=[];if(rows.length&&/round\s*name/i.test(String(rows[0][0]||''))){let cur=null;rows.slice(1).forEach(r=>{const a=r[0]&&String(r[0]).trim();if(a){if(/^trading break|^capped & uncapped/i.test(a))cur=null;else cur=a.replace(/\s+/g,' ')}if(cur&&r[2]&&String(r[2]).trim()&&r[1]!=null)out.push([cur,String(r[2]).trim(),r[3]])});return out}
+ return rows.filter(r=>r.length>=2&&r[1]).map(r=>r.length>=3?[r[0],String(r[1]),r[2]]:[null,String(r[0]),r[1]]).filter(r=>!/^(name|player)$/i.test(String(r[1]).trim()))}
+function addPlayersOld(list){const m=$('apMsg');if(!list.length){m.className='msg bad';m.textContent='Nothing to add.';return}
+ const have=new Set(S.players.map(p=>p.name.trim().toLowerCase()));let add=0,skip=0,id=Math.max(0,...S.players.map(p=>p.id)),no=Math.max(0,...S.players.map(p=>+p.no||0)),sets=0;
+ const sidx=n=>{let i=S.sets.findIndex(s=>!s.brk&&s.name.toLowerCase()===String(n).trim().toLowerCase());if(i<0){S.sets.push({name:String(n).trim(),brk:false});i=S.sets.length-1;sets++}return i};
+ const defNew=$('apNew').value.trim(),defIdx=+$('apSet').value;
+ list.forEach(([s,n,b])=>{n=String(n||'').trim();if(!n){return}if(have.has(n.toLowerCase())){skip++;return}have.add(n.toLowerCase());const i=s?sidx(s):defNew?sidx(defNew):defIdx;if(isNaN(i)||!S.sets[i]){skip++;return}const bv=parseFloat(b);S.players.push({id:++id,set:i,no:++no,name:n,base:isNaN(bv)?null:bv,status:'avail',team:null,price:null,foreign:false,via:'',hist:[]});add++});
+ m.className='msg ok';m.textContent=`Added ${add} player(s) and ${sets} new set(s); skipped ${skip} duplicate/invalid.`;$('apTxt').value='';save();renderAll()}
+$('apFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const m=$('apMsg'),r=new FileReader();m.className='msg';m.textContent='Reading file…';
+ r.onload=()=>{try{let rows;if(window.XLSX){const wb=XLSX.read(r.result,{type:'array'});const ws=wb.Sheets['Auction Pool']||wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null})}else{rows=parseText(new TextDecoder().decode(r.result)).map(x=>x)}
+  addPlayers(window.XLSX?parseRows(rows):rows)}catch(x){m.className='msg bad';m.textContent='Could not read that file: '+x.message}e.target.value=''};r.readAsArrayBuffer(f)});
+
+/* ---- export ---- */
+const q=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+const csv=rows=>rows.map(r=>r.map(q).join(',')).join('\n');
+const setDone=i=>{const pl=S.players.filter(p=>p.set===i);return pl.length>0&&pl.every(p=>p.status!=='avail'&&p.id!==S.current)};
+const doneSets=()=>S.sets.map((x,i)=>!x.brk&&setDone(i)?i:-1).filter(i=>i>=0);
+function exData(k){const sf=$('exSet').value,ds=doneSets().filter(i=>sf===''||+sf===i),secs=[];
+ const pl=S.players.filter(p=>p.team&&(ds.includes(p.set)||(S.sets[p.set].hid&&sf===''))).sort((a,b)=>a.set-b.set||a.no-b.no);
+ if(k!=='trades'&&pl.length)secs.push(['COMPLETED SETS',csv([['Set','P.No','Player','Team','Sold Price (Cr)','Foreign','Acquired Via','Trade History']].concat(pl.map(p=>[lab(S.sets[p.set].name),p.no,p.name,p.team,p.price,p.foreign?'Yes':'No',p.via,p.hist.map(h=>'T'+h.no+' with '+h.with).join(' ')])))]);
+ if(k!=='players'&&S.trades.length)secs.push(['TRADES',csv([['Trade No','Team A','Team B','A gave','B gave','A paid B (Cr)','B paid A (Cr)','Net cash A to B (Cr)','Time']].concat(S.trades.map(t=>['T'+t.no,t.a,t.b,t.gA.join('; '),t.gB.join('; '),t.ab||(t.cash>0?t.cash:0),t.ba||(t.cash<0?-t.cash:0),t.cash,t.at])))]);
+ if(!secs.length)return'Nothing to export yet: no completed sets or trades.';
+ return k==='full'?secs.map(([h,t])=>'# '+h+'\n'+t).join('\n\n'):secs[0][1]}
+function exDataOld(k){const sf=$('exSet').value,pls=S.players.filter(p=>sf===''||p.set===+sf);
+ const pl=[['Set','P.No','Player','Base (Cr)','Status','Team','Sold Price (Cr)','Foreign','Acquired Via','Trade History']].concat(pls.map(p=>[lab(S.sets[p.set].name),p.no,p.name,p.base??'',p.status==='sold'?'Sold':p.status==='unsold'?'Unsold':'In pool',p.team||'',p.price??'',p.team?(p.foreign?'Yes':'No'):'',p.team?p.via:'',p.hist.map(h=>'T'+h.no+'<>'+h.with).join(' ')]));
+ const tm=[['Team','Players Bought','Foreign Bought','Purse Remaining (From 120)']].concat(TEAMS.map(([t])=>{const s=st(t);return[t,s.n,s.f,s.purse]}));
+ const tr=[['Trade No','Team A','Team B','A gave','B gave','Cash A to B (Cr)','Time']].concat(S.trades.map(t=>['T'+t.no,t.a,t.b,t.gA.join('; '),t.gB.join('; '),t.cash,t.at]));
+ return k==='players'?csv(pl):k==='teams'?csv(tm):k==='trades'?csv(tr):['# TEAM SUMMARY',csv(tm),'','# TRADES',csv(tr),'','# PLAYERS',csv(pl)].join('\n')}
+function exPrev(){$('exTxt').value=exData($('exSel').value)}
+function exCopy(){exPrev();const t=$('exTxt');t.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}try{navigator.clipboard.writeText(t.value);ok=true}catch(e){}$('exMsg').className='msg ok';$('exMsg').textContent=ok?'Copied. Paste into Google Sheets.':'Text selected; press Ctrl/Cmd+C.'}
+async function exDl(){exPrev();try{const d=await claude.use('downloads');if(!d)throw 0;await d.save({filename:`auction-${$('exSel').value}.csv`,data:$('exTxt').value});$('exMsg').className='msg ok';$('exMsg').textContent='Saved.'}catch(e){exCopy()}}
+function reset(){const b=$('rst');if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='Click again to ERASE everything';setTimeout(()=>{b.dataset.arm='0';b.textContent='Reset entire auction'},4000);return}S=fresh();S.v=(S.v||0)+1;save();b.dataset.arm='0';b.textContent='Reset entire auction';renderAll()}
+
+/* ---- render ---- */
+function opts(el,arr,keep){const v=el.value;el.innerHTML=arr.map(a=>`<option value="${a[0]}">${esc(a[1])}</option>`).join('');if(keep&&[...el.options].some(o=>o.value===v))el.value=v}
+function renderAll(){renderDisp();if(mode==='admin'&&ADMIN)renderAdmin();if(modalFn&&$('modal').style.display==='flex')$('mBody').innerHTML=modalFn()}
+function renderAdmin(){const act=document.activeElement&&document.activeElement.id;
+ opts($('setSel'),S.sets.map((s,i)=>s.brk?null:[i,`${lab(s.name)} (${avail(i).length} left)`]).filter(Boolean).concat([['U',`Unsold Players (${S.players.filter(x=>x.status==='unsold').length})`]]));$('setSel').value=S.curSet;$('setSel').disabled=!setUnlocked;$('lockB').textContent=setUnlocked?'Lock':'Unlock';
+ const tt=TEAMS.map(t=>[t[0],t[0]]);['sTeam','shTeam','trA','trB'].forEach(i=>opts($(i),tt,1));if($('trA').value===$('trB').value&&!window._ti){$('trB').value='MI';window._ti=1}
+ opts($('trD'),[['none','No cash'],['ab','Team A pays Team B'],['ba','Team B pays Team A'],['both','Both pay each other (A→B and B→A)']],1);
+ opts($('exSet'),[['','All completed sets']].concat(doneSets().map(i=>[i,lab(S.sets[i].name)])),1);
+ const p=P(S.current);$('curBox').innerHTML=p?`<b>${esc(p.name)}</b><span>${esc(lab(S.sets[p.set].name))} · P.No ${p.no}</span>`:'<span>No player drawn</span>';
+ $('baseP').textContent=p?cr(p.base??0):'—';if(act!=='liveP')$('liveP').value=S.live??'';$('liveL').textContent=lakhTxt(S.live);
+ const x=S.live??0,tier=Math.round(inc(x)*100);$('raiseB').innerHTML=[10,20,25].map(l=>`<button class="${p&&tier===l?'on':''}" onclick="raise(${l})" ${p&&tier===l?'':'disabled'}>+${l} Lakh</button>`).join('')+`<button class="sec" onclick="undoRaise()" ${p&&S.raises.length?'':'disabled'}>Undo</button>`;const _u=p?`<button onclick="raise(1)">Raise +${n} Lakh</button><button onclick="raise(2)">×2</button><button onclick="raise(5)">×5</button><button class="sec" onclick="undoRaise()" ${S.raises.length?'':'disabled'}>Undo raise</button>`:'<span class="hint">Draw a player to enable bid raises.</span>';
+ $('trk').innerHTML='<tr><th>Team</th><th>Squad /25</th><th>Purse /120</th><th>Foreign /8</th><th>Trades left</th></tr>'+TEAMS.map(([t,c])=>{const s=st(t);return`<tr class="clk" onclick="$('shTeam').value='${t}';renderSheet();$('sheet').scrollIntoView({behavior:'smooth',block:'center'})"><td><span class="dot" style="background:${c}"></span><b>${t}</b></td><td class="${s.n>=MAXSQ?'lim':''}">${s.n}/${MAXSQ}</td><td class="${s.purse<=0?'lim':''}">${cr(s.purse)}</td><td class="${s.f>=MAXF?'lim':''}">${s.f}/${MAXF}</td><td class="${trLeft(t)<1?'lim':''}">${trLeft(t)}/${MAXTR}</td></tr>`}).join('');
+ $('alerts').innerHTML=TEAMS.flatMap(([t])=>{const s=st(t),o=[];if(s.n>=MAXSQ)o.push(`${t}: squad full`);if(s.f>=MAXF)o.push(`${t}: foreign quota full`);if(s.purse<=0)o.push(`${t}: purse exhausted`);return o}).map(x=>`<div class="ban warn" style="padding:6px 12px">${esc(x)}</div>`).join('');
+ renderSheet();fillTrade();
+ $('trLog').innerHTML=S.trades.length?S.trades.slice().reverse().map(t=>`<span class="chip" style="border-color:${COL[t.a]}" onclick="showTrade(${t.no})">T${t.no}: ${t.a} ⇄ ${t.b}</span>`).join(''):'<span class="hint">No trades yet.</span>';
+ $('pool').innerHTML='<tr><th>Set</th><th>Total</th><th>Left</th><th>Sold</th><th>Unsold</th><th></th></tr>'+S.sets.map((s,i)=>{if(s.brk)return'';const a=S.players.filter(z=>z.set===i);return`<tr><td>${esc(lab(s.name))}</td><td>${a.length}</td><td>${avail(i).length+(S.current&&P(S.current).set===i?1:0)}</td><td>${a.filter(z=>z.status==='sold').length}</td><td>${a.filter(z=>z.status==='unsold').length}</td><td>${a.some(z=>z.status==='unsold')?`<button class="sec sm" onclick="readd(${i})">Re-add unsold</button>`:''}</td></tr>`}).join('');
+ const us=S.players.filter(z=>z.wasUns);$('pool').innerHTML+=`<tr><td><b>Unsold Players</b></td><td>${us.length}</td><td>${avail('U').length+(S.current&&P(S.current).status==='unsold'?1:0)}</td><td>${us.filter(z=>z.status==='sold').length}</td><td>${us.filter(z=>z.status==='unsold').length}</td><td></td></tr>`;impUi();exPrev();chk()}
+function renderSheet(){const t=$('shTeam').value||'CSK',tr=S.trades.filter(x=>x.a===t||x.b===t);
+ $('chips').innerHTML='Trades: '+(tr.map(x=>{const o=x.a===t?x.b:x.a;return`<span class="chip" style="border-color:${COL[o]}" onclick="showTrade(${x.no})">T${x.no} ⇄ ${o}</span>`}).join('')||'<span class="hint">none</span>');
+ $('sheet').innerHTML='<tr><th>#</th><th>Player</th><th>Price</th><th>Foreign</th><th>Via</th><th></th></tr>'+own(t).map((p,i)=>{const h=p.hist[p.hist.length-1],c=h?COL[h.with]:null;return`<tr ${c?`style="background:color-mix(in srgb,${c} 22%,transparent);box-shadow:inset 4px 0 ${c}"`:''}><td>${i+1}</td><td><b>${esc(p.name)}</b></td><td>${cr(p.price)}</td><td>${p.foreign?'Yes':'—'}</td><td>${p.via}${p.hist.map(x=>` <span class="chip" style="border-color:${COL[x.with]};padding:0 6px" onclick="showTrade(${x.no})">T${x.no}</span>`).join('')}</td><td>${p.hist.length?'':`<button class="sec sm" onclick="undoSale(${p.id})">undo</button>`}</td></tr>`}).join('')||'<tr><td colspan="6" class="hint">No players yet.</td></tr>'}
+function fillTrade(){['A','B'].forEach(k=>{const t=$('tr'+k).value,el=$('g'+k),old=new Set(sel('g'+k));el.innerHTML=own(t).map(p=>`<label><input type="checkbox" value="${p.id}" ${old.has(p.id)?'checked':''} onchange="trPrev()">${esc(p.name)}${p.foreign?' (F)':''}</label>`).join('')||'<span class="hint">No players</span>'});trPrev()}
+function renderDisp(){if(mode!=='disp')return;
+ $('dT').innerHTML=TEAMS.map(([t,c])=>{const s=st(t);return`<button class="tm ${S.lastTeam===t?'hit':''}" style="border-top-color:${c}" onclick="showTeam('${t}')"><h3>${t}</h3><div><span>Players</span><b class="${s.n>=MAXSQ?'lim':''}">${s.n}/${MAXSQ}</b></div><div><span>Purse</span><b class="${s.purse<=0?'lim':''}">${r2(s.purse)}/${PURSE}</b></div><div><span>Foreign</span><b class="${s.f>=MAXF?'lim':''}">${s.f}/${MAXF}</b></div><div><span>Trades left</span><b class="${trLeft(t)<1?'lim':''}">${trLeft(t)}/${MAXTR}</b></div></button>`}).join('');
+ $('dSets').innerHTML=S.sets.map((s,i)=>s.brk?'':`<button class="schip ${S.curSet===i?'on':''}" onclick="showSet(${i})" onmouseenter="hov(event,${i})" onmouseleave="hov()">${esc(lab(s.name))}<small>${avail(i).length}/${S.players.filter(x=>x.set===i).length}</small></button>`).join('')+`<button class="schip ${S.curSet==='U'?'on':''}" onclick="showSet('U')" onmouseenter="hov(event,'U')" onmouseleave="hov()">Unsold Players<small>${avail('U').length}/${S.players.filter(x=>x.wasUns).length}</small></button>`;
+ const p=P(S.current),cs={name:setName(S.curSet)};
+ $('dSet').textContent=p?lab(S.sets[p.set].name):'Awaiting next player';$('dName').textContent=p?p.name:(S.last?S.lastName:'—');
+ $('dMeta').innerHTML=p?`Base <b>${cr(p.base??0)}</b> &nbsp;·&nbsp; Current bid <b>${cr(S.live??p.base??0)}</b>`:'';$('dRes').textContent=p?'':S.last;$('dRes').style.color=S.last==='UNSOLD'?'var(--bad)':'var(--ok)';
+ const inSet=setPlayers(S.curSet),left=avail(S.curSet).length+(p&&inS(p,S.curSet)?1:0),sold=inSet.filter(x=>x.status==='sold').length,all=S.players.filter(x=>x.team).length,un=S.players.filter(x=>x.status==='unsold');
+ $('dSetSt').innerHTML=`<i>Current set</i><b style="font-size:clamp(16px,2vw,28px)">${esc(lab(cs.name))}</b><div class="l"><span>Remaining in set</span><b style="font-size:inherit;display:inline">${left}</b></div><div class="l"><span>Sold in set</span><b style="font-size:inherit;display:inline">${sold}</b></div>`;
+ $('dSold').innerHTML=`<i>Total players sold</i><b>${all} <small style="font-size:.45em;color:var(--mut)">/ ${S.players.length}</small></b>`;
+ $('dUn').innerHTML=`<i>Unsold / Total players · tap for list</i><div class="two"><div><b style="color:var(--bad)">${un.length}</b><i>Unsold</i></div><div><b>${S.players.length}</b><i>Total</i></div></div>`;
+ let nx='—';if(S.curSet!=='U'){for(let i=S.curSet+1;i<S.sets.length;i++){if((S.sets[i].brk&&!S.sets[i].hid)||avail(i).length){nx=S.sets[i].brk?S.sets[i].name:lab(S.sets[i].name);break}}if(nx==='—'&&un.length)nx='Unsold Players'}
+ const so=S.players.filter(x=>x.price!=null).sort((a,b)=>b.price-a.price),it=[`NEXT SET: ${nx}`];
+ it.push(so.length?`HIGHEST BID OF AUCTION: ${so[0].name} → ${so[0].team} @ ${cr(so[0].price)}`:'HIGHEST BID OF AUCTION: awaiting first sale');
+ TEAMS.forEach(([t])=>{const b=own(t).filter(x=>x.price!=null).sort((a,b)=>b.price-a.price)[0];it.push(`${t} TOP BUY: ${b?`${b.name} @ ${cr(b.price)}`:'—'}`)});
+ const tn=S.tradeNote&&Date.now()-S.tradeNote.at<150000?S.tradeNote.text:null,h=(tn?`<span style="background:var(--acc);color:#fff;padding:2px 14px;border-radius:6px">⚡ ${esc(tn)}</span>`:'')+it.map(x=>`<span>◆ ${esc(x)}</span>`).join('');if($('tk').dataset.h!==h){$('tk').dataset.h=h;$('tk').innerHTML=h;$('tk').style.animationDuration=Math.max(30,h.length/9)+'s'}}
+
+/* ---- JSON backup / restore ---- */
+function bkOk(){if($('bkPw').value!==SET_PW){banner('Incorrect admin password.');return false}return true}
+async function bkExport(){if(!bkOk())return;$('bkPw').value='';
+ const txt=JSON.stringify({app:'ipl-auction',exported:new Date().toISOString(),state:S},null,1),fn='auction-backup-'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json',m=$('bkMsg');
+ $('bkTxt').value=txt;m.className='msg ok';m.textContent='Backup ready ('+Math.round(txt.length/1024)+' KB).';
+ try{const d=await claude.use('downloads');if(!d)throw 0;await d.save({filename:fn,data:txt});m.textContent='Backup saved as '+fn+'. A copy is also in the box below.'}
+ catch(e){try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=fn;document.body.appendChild(a);a.click();a.remove();m.textContent='Download started. If nothing saved, copy the JSON from the box below into a .json file.'}catch(x){m.textContent='Copy the JSON from the box below into a .json file.'}}}
+function bkRestore(t){try{const j=JSON.parse(t),st=j.state||j;if(!st.sets||!st.players||!st.teams)throw new Error('this is not an auction backup');
+ S=st;S.dataId=DATA.id;S.v=Date.now();S.current=S.current||null;tvSig=null;$('bkPw').value='';save();renderAll();$('bkMsg').className='msg ok';$('bkMsg').textContent=`Restored: ${S.sets.filter(x=>!x.brk).length} sets, ${S.players.length} players, ${S.players.filter(p=>p.team).length} sold, ${S.trades.length} trades.`;banner('State restored from backup and synced.','good')}
+ catch(x){banner('Restore failed: '+x.message)}}
+function bkPaste(){if(!bkOk())return;bkRestore($('bkTxt').value)}
+$('bkFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f||!bkOk())return;const r=new FileReader();r.onload=()=>bkRestore(r.result);r.readAsText(f)});
+
+/* ---- Firebase Realtime Database (used when the file runs outside the Claude artifact sandbox) ---- */
+const firebaseConfig={apiKey:"AIzaSyBn8dmaYKBhA10wvrM-EFicEH2XQpzyKc0",authDomain:"auauction26.firebaseapp.com",databaseURL:"https://auauction26-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"auauction26",storageBucket:"auauction26.firebasestorage.app",messagingSenderId:"683576908017",appId:"1:683576908017:web:8776a704e1ba5a4a747150"};
+const loadJs=u=>new Promise((res,rej)=>{const e=document.createElement('script');e.src=u;e.onload=res;e.onerror=rej;document.head.appendChild(e)});
+async function fbInit(){ADMIN=location.hash!=='#display';
+ try{const b='https://cdn.jsdelivr.net/npm/firebase@10.12.2/';await loadJs(b+'firebase-app-compat.js');await loadJs(b+'firebase-database-compat.js');
+  firebase.initializeApp(firebaseConfig);const ref=firebase.database().ref('rooms/room1/state');doc={set:o=>ref.set(o)};
+  const first=(await ref.once('value')).val();
+  if(first&&first.dataId===DATA.id){if(!ADMIN||first.v>(S.v||0)){S=first;if(ADMIN)try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}}else if(ADMIN)push();
+  if(!ADMIN)ref.on('value',sn=>{const r=sn.val();if(r&&r.dataId===DATA.id){S=r;renderAll()}});
+  $('sync').textContent='Firebase live sync · Room 1';$('sync').className='pill on'}
+ catch(e){doc=null;$('sync').textContent='Local only (Firebase unreachable)';$('sync').className='pill'}}
+
+/* ---- boot ---- */
+try{['auction_dash_v1','auction_dash_v2','auction_dash_v3','auction_dash_v4'].forEach(k=>localStorage.removeItem(k))}catch(e){}
+S=loadLocal();if(!S||!S.sets||!S.players||S.dataId!==DATA.id)S=fresh();
+(async()=>{
+ renderAll();mode=location.hash==='#display'?'disp':'admin';view(mode);
+ if(window.claude&&claude.use){
+  try{const u=await claude.use('user');ADMIN=!!u&&await u.canEdit()}catch(e){ADMIN=false}
+  try{const D=await claude.use('db');if(D){doc=D.doc('auction/state');
+   try{const s=await doc.get();if(s.exists){const r=JSON.parse(s.data().json);if(r.dataId===DATA.id){if(!ADMIN||r.v>(S.v||0)){S=r;if(ADMIN)try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}}else if(ADMIN)push()}else if(ADMIN)push()}catch(e){}
+   if(!ADMIN)doc.onSnapshot(s=>{if(s.exists){try{const r=JSON.parse(s.data().json);if(r.dataId===DATA.id){S=r;renderAll()}}catch(e){}}},()=>{});
+   $('sync').textContent=ADMIN?'Live sync on':'';$('sync').className='pill on'}}catch(e){}
+  if(!doc){$('sync').textContent='Local only'}
+ }else await fbInit();
+ view(ADMIN?mode:'disp')})();
+setInterval(()=>{if(S&&S.tradeNote)renderDisp()},10000);window.addEventListener('storage',e=>{if(e.key===KEY&&e.newValue&&!ADMIN){try{S=JSON.parse(e.newValue);renderAll()}catch(x){}}});
+</script></body></html>
